@@ -5,7 +5,7 @@ use ai::diff_validation::DiffType;
 #[cfg(not(target_family = "wasm"))]
 use futures::FutureExt;
 #[cfg(not(target_family = "wasm"))]
-use warp_files::{FileModel, FileModelEvent};
+
 use warp_util::file::FileId;
 #[cfg(not(target_family = "wasm"))]
 use warp_util::file::FileSaveError;
@@ -40,7 +40,7 @@ pub enum InlineDiffViewEvent {
 /// An inline diff viewer with optional file-backed save support.
 ///
 /// When a backing file is registered (via [`Self::register_file`]), this view supports the full
-/// accept/save/revert lifecycle through `FileModel`. Without a registered file, it behaves
+/// accept/save/revert lifecycle through ``. Without a registered file, it behaves
 /// as a read-only diff viewer (e.g. for WASM or restored conversations).
 pub struct InlineDiffView {
     editor: ViewHandle<CodeEditorView>,
@@ -48,11 +48,11 @@ pub struct InlineDiffView {
     file_path: Option<StandardizedPath>,
     /// Whether the user has edited the diff content.
     was_edited: bool,
-    /// `FileModel` file ID for the backing file. Set via [`Self::register_file`].
+    /// `` file ID for the backing file. Set via [`Self::register_file`].
     ///
     /// When `Some`:
     /// - The editor is editable (interaction state follows the `DisplayMode` rules).
-    /// - Accept, save, and revert operations write through `FileModel`.
+    /// - Accept, save, and revert operations write through ``.
     ///
     /// When `None` (WASM, restored conversations, or before registration):
     /// - The editor is selection-only (never editable).
@@ -105,7 +105,7 @@ impl InlineDiffView {
         model
     }
 
-    /// Register a file with `FileModel` for save support.
+    /// Register a file with `` for save support.
     ///
     /// The `session_type` determines whether the file is local or remote.
     /// For `Local`, the file is registered by path on the local filesystem.
@@ -120,7 +120,7 @@ impl InlineDiffView {
             return;
         };
 
-        let file_model = FileModel::handle(ctx);
+        let file_model = ::handle(ctx);
         let file_id = match session_type {
             DiffSessionType::Local => {
                 let Some(local_path) = file_path.to_local_path() else {
@@ -153,10 +153,10 @@ impl InlineDiffView {
     }
 
     /// Common registration logic: subscribes to events and sets the
-    /// backing file ID after a file has been registered with `FileModel`.
+    /// backing file ID after a file has been registered with ``.
     #[cfg(not(target_family = "wasm"))]
     fn finish_file_registration(&mut self, file_id: FileId, ctx: &mut ViewContext<Self>) {
-        let file_model = FileModel::handle(ctx);
+        let file_model = ::handle(ctx);
 
         let version = self.editor.as_ref(ctx).version(ctx);
         file_model.update(ctx, |file_model, _ctx| {
@@ -165,14 +165,14 @@ impl InlineDiffView {
 
         self.backing_file_id = Some(file_id);
 
-        // Subscribe to FileModel events for this file.
+        // Subscribe to  events for this file.
         ctx.subscribe_to_model(&file_model, move |_me, _file_model, event, ctx| {
             if file_id == event.file_id() {
                 match event {
-                    FileModelEvent::FileSaved { .. } => {
+                    Event::FileSaved { .. } => {
                         ctx.emit(InlineDiffViewEvent::FileSaved);
                     }
-                    FileModelEvent::FailedToSave { error, .. } => {
+                    Event::FailedToSave { error, .. } => {
                         ctx.emit(InlineDiffViewEvent::FailedToSave {
                             error: error.clone(),
                         });
@@ -213,7 +213,7 @@ impl InlineDiffView {
         });
     }
 
-    /// Saves the current editor content through `FileModel`, returning the
+    /// Saves the current editor content through ``, returning the
     /// save's completion future. `FileSaved` / `FailedToSave` events still
     /// fire alongside. `None` when no file is registered.
     #[cfg(not(target_family = "wasm"))]
@@ -222,7 +222,7 @@ impl InlineDiffView {
         let content = self.editor.as_ref(ctx).text(ctx).into_string();
         let version = self.editor.as_ref(ctx).version(ctx);
 
-        match FileModel::handle(ctx).update(ctx, |file_model, ctx| {
+        match ::handle(ctx).update(ctx, |file_model, ctx| {
             file_model.save(file_id, content, version, ctx)
         }) {
             Ok(save_future) => Some(save_future),
@@ -324,7 +324,7 @@ impl DiffViewer for InlineDiffView {
                 // For newly created files, delete instead of restoring. The
                 // delete's completion is observed via `FileSaved` events.
                 let version = self.editor.as_ref(_ctx).version(_ctx);
-                FileModel::handle(_ctx)
+                ::handle(_ctx)
                     .update(_ctx, |file_model, ctx| {
                         file_model.delete(file_id, version, ctx)
                     })
@@ -347,7 +347,7 @@ impl DiffViewer for InlineDiffView {
 
             let version = self.editor.as_ref(_ctx).version(_ctx);
             // The revert save's completion is observed via `FileSaved` events.
-            FileModel::handle(_ctx)
+            ::handle(_ctx)
                 .update(_ctx, |file_model, ctx| {
                     file_model.save(file_id, base_content, version, ctx)
                 })

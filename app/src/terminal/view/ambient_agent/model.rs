@@ -36,8 +36,8 @@ use crate::ai::orchestration::{
     CloudAgentStartupBlocker, CloudAgentStartupFailure, CloudAgentStartupIssue,
     classify_cloud_agent_startup_error, should_disable_snapshot,
 };
-use crate::cloud_object::CloudObjectLookup as _;
-use crate::cloud_object::model::persistence::{CloudModel, CloudModelEvent};
+
+
 use crate::server::cloud_objects::update_manager::UpdateManager;
 use crate::server::ids::{ServerId, SyncId};
 use crate::server::server_api::ServerApiProvider;
@@ -204,7 +204,7 @@ impl AmbientAgentViewModel {
         terminal_view: WeakViewHandle<TerminalView>,
         ctx: &mut ModelContext<Self>,
     ) -> Self {
-        ctx.subscribe_to_model(&CloudModel::handle(ctx), |me, _, event, ctx| {
+        ctx.subscribe_to_model(&handle(ctx), |me, _, event, ctx| {
             me.handle_cloud_model_event(event, ctx);
         });
 

@@ -5,23 +5,16 @@ use warp_core::features;
 fn main() -> Result<()> {
     let config = warp_channel_config::load_config!("local");
 
+    // Cognix v1: Local terminal only. No cloud, account, or product features.
     let mut state = ChannelState::new(Channel::Local, config)
         .with_additional_features(features::DEBUG_FLAGS)
-        .with_additional_features(features::DOGFOOD_FLAGS)
-        .with_additional_features(features::PREVIEW_FLAGS)
         .with_additional_features(features::LOCAL_FLAGS);
-
-    // Enable sandbox telemetry feature flag if the env var is set.
-    if std::env::var("WITH_SANDBOX_TELEMETRY").is_ok() {
-        state = state.with_additional_features(&[features::FeatureFlag::WithSandboxTelemetry]);
-    }
 
     ChannelState::set(state);
 
     warp::run()
 }
 
-// If we're not using an external plist, embed the following as the Info.plist.
 #[cfg(all(not(feature = "extern_plist"), target_os = "macos"))]
 embed_plist::embed_info_plist_bytes!(r#"
     <?xml version="1.0" encoding="UTF-8"?>
@@ -31,15 +24,15 @@ embed_plist::embed_info_plist_bytes!(r#"
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleDisplayName</key>
-    <string>WarpLocal</string>
+    <string>Cognix</string>
     <key>CFBundleExecutable</key>
-    <string>warp</string>
+    <string>cognix</string>
     <key>CFBundleIdentifier</key>
-    <string>dev.warp.Warp-Local</string>
+    <string>dev.cognix.Cognix</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>WarpLocal</string>
+    <string>Cognix</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -51,7 +44,7 @@ embed_plist::embed_info_plist_bytes!(r#"
     <key>UIDesignRequiresCompatibility</key>
     <true/>
     <key>CFBundleURLTypes</key>
-    <array><dict><key>CFBundleURLName</key><string>Custom App</string><key>CFBundleURLSchemes</key><array><string>warplocal</string></array></dict></array>
+    <array><dict><key>CFBundleURLName</key><string>Custom App</string><key>CFBundleURLSchemes</key><array><string>cognix</string></array></dict></array>
     <key>NSHumanReadableCopyright</key>
     <string>© 2026, Denver Technologies, Inc</string>
     </dict>

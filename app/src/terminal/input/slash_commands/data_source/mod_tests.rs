@@ -1,5 +1,5 @@
 use super::prefix_match_bonus;
-use crate::search::slash_command_menu::fuzzy_match::SlashCommandFuzzyMatchResult;
+use crate::search::slash_command_menu::SlashCommandFuzzyMatchResult;
 
 #[test]
 fn exact_match_returns_full_bonus() {

@@ -82,11 +82,11 @@ use crate::app_state::{
 use crate::auth::UserUid;
 use crate::auth::auth_manager::PersistedCurrentUserInformation;
 use crate::auth::auth_state::AuthStateProvider;
-use crate::cloud_object::model::actions::{
+use model::actions::{
     ObjectAction, ObjectActionSubtype, object_action_from_persisted,
 };
-use crate::cloud_object::model::generic_string_model::{CloudStringObject, GenericStringObjectId};
-use crate::cloud_object::{CloudObject, ObjectIdType};
+
+
 use crate::code::editor_management::CodeSource;
 use crate::drive::OpenWarpDriveObjectSettings;
 use crate::notebooks::NotebookId;
@@ -481,7 +481,7 @@ fn tui_database_file_path() -> PathBuf {
 }
 
 fn remote_server_daemon_database_file_path(identity_key: &str) -> PathBuf {
-    let data_dir = remote_server::setup::remote_server_daemon_data_dir(identity_key);
+    let data_dir = setup::remote_server_daemon_data_dir(identity_key);
     let expanded_data_dir = shellexpand::tilde(&data_dir).into_owned();
     PathBuf::from(expanded_data_dir).join(WARP_SQLITE_FILE_NAME)
 }

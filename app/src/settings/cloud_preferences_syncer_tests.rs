@@ -15,8 +15,8 @@ use super::{
 };
 use crate::ASSETS;
 use crate::auth::auth_state::AuthState;
-use crate::cloud_object::model::generic_string_model::GenericStringObjectId;
-use crate::cloud_object::{
+
+use {
     BulkCreateCloudObjectResult, CreatedCloudObject, GenericStringObjectFormat,
     GenericStringObjectUniqueKey, JsonObjectType, ObjectDeleteResult, ObjectIdType, Owner,
     Revision, RevisionAndLastEditor, ServerMetadata, ServerObject, ServerPermissions,

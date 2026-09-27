@@ -9,7 +9,7 @@ use warpui::ui_components::button::{ButtonVariant, TextAndIcon, TextAndIconAlign
 use warpui::ui_components::components::{UiComponent, UiComponentStyles};
 use warpui::{AppContext, Element, Entity, SingletonEntity, View, ViewContext};
 
-use crate::cloud_object::model::persistence::{CloudModel, CloudModelEvent};
+
 use crate::drive::CloudObjectTypeAndId;
 use crate::terminal::view::telemetry::SharingDialogSource;
 use crate::ui_components::icons::Icon;
@@ -25,7 +25,7 @@ pub struct OnboardingDriveSharingBlock {
 impl OnboardingDriveSharingBlock {
     pub fn new(object_id: CloudObjectTypeAndId, ctx: &mut ViewContext<Self>) -> Self {
         // Re-render if the object in the block is renamed.
-        ctx.subscribe_to_model(&CloudModel::handle(ctx), |me, _, event, ctx| {
+        ctx.subscribe_to_model(&handle(ctx), |me, _, event, ctx| {
             if let CloudModelEvent::ObjectUpdated { type_and_id, .. } = event
                 && &me.object_id == type_and_id
             {
@@ -92,7 +92,7 @@ impl View for OnboardingDriveSharingBlock {
             );
         }
 
-        let button_label = match CloudModel::as_ref(app).get_by_uid(&self.object_id.uid()) {
+        let button_label = match as_ref(app).get_by_uid(&self.object_id.uid()) {
             Some(object) => format!("Share {}", object.display_name()),
             None => format!("Share this {}", self.object_id.object_type()),
         };

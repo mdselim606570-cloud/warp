@@ -250,3 +250,41 @@ if FeatureFlag::YourNewFeature.is_enabled() {
 ### Exhaustive Matching
 
 When adding/editing match statements, avoid using the wildcard _ when at all possible. Exhaustive matching is helpful for ensuring that all variants are handled, especially when adding new variants to enums in the future.
+
+## Cognix v1 - Terminal-Only Product
+
+This repository has been reduced to a terminal-only product (Cognix v1) by removing all Warp-specific product systems that are not required for local terminal execution.
+
+### Product Boundary
+- Local terminal session management
+- Local shell/PTY execution
+- Local UI for terminal interaction
+- Minimal local settings/config
+
+### Removed Systems
+- Account/auth flows
+- Drive and cloud-backed storage
+- Cloud sync and object persistence
+- GraphQL client/server contracts
+- Server auth and token plumbing
+- Team/collaboration features
+- Billing/subscription systems
+- Warp-specific telemetry
+- Onboarding and marketing UI
+- Account/settings/workspace management UX
+- Browser/web-pane features
+- Notifications and account-related UI
+
+### Build Configuration
+- `cargo run` / `./script/run` - Build and run the Cognix terminal app
+- `./script/run-tui` - Build and run the headless TUI front-end
+- `cargo check -p app` - Validate the reduced build
+
+### Key Files
+- `COGNIX_V1_CHECKLIST.md` - Formal engineering checklist
+- `COGNIX_LICENSE.md` - Licensing boundary documentation
+- `COGNIX_V1_SUMMARY.md` - Summary of all changes made
+
+### Licensing
+- AGPL-3.0-only: Terminal runtime, product code
+- MIT: UI framework code (`crates/warpui`, `crates/warpui_core`, `crates/warpui_extras`)

@@ -214,11 +214,11 @@ use crate::ai::skills::{SkillOpenOrigin, SkillTelemetryEvent};
 use crate::ai_assistant::execution_context::execution_context_for_session;
 use crate::appearance::{Appearance, AppearanceEvent};
 use crate::channel::{Channel, ChannelState};
-use crate::cloud_object::model::actions::ObjectActionType;
-use crate::cloud_object::model::generic_string_model::StringModel;
-use crate::cloud_object::model::persistence::CloudModel;
-use crate::cloud_object::model::view::CloudViewModel;
-use crate::cloud_object::{CloudObject, CloudObjectLookup as _, Space};
+
+
+
+
+
 #[cfg(feature = "local_fs")]
 use crate::code::editor_management::CodeSource;
 use crate::code_review::diff_state::DiffMode;
@@ -4987,7 +4987,7 @@ impl Input {
 
     #[cfg(all(feature = "local_fs", not(target_family = "wasm")))]
     fn maybe_launch_cloud_handoff_request(&mut self, ctx: &mut ViewContext<Self>) -> bool {
-        use crate::cloud_object::CloudObjectLookup as _;
+        
 
         if !FeatureFlag::OzHandoff.is_enabled()
             || !FeatureFlag::HandoffLocalCloud.is_enabled()
@@ -5579,7 +5579,7 @@ impl Input {
     ) {
         let InlinePromptsMenuEvent::SelectedPrompt { id } = event;
 
-        let Some(workflow) = CloudModel::as_ref(ctx).get_workflow(id).cloned() else {
+        let Some(workflow) = as_ref(ctx).get_workflow(id).cloned() else {
             log::warn!("Tried to open saved prompt for id {id:?} but it does not exist");
             return;
         };
@@ -8410,7 +8410,7 @@ impl Input {
                 let workflow_id = workflow.server_id();
                 let workflow_source = *workflow_source;
                 let space = workflow_id.and_then(|id| {
-                    CloudViewModel::as_ref(ctx)
+                    as_ref(ctx)
                         .object_space(&id.to_string(), ctx)
                         .map(Into::into)
                 });
@@ -8644,7 +8644,7 @@ impl Input {
                 });
 
                 // Get enum variants
-                let cloud_model = CloudModel::as_ref(ctx);
+                let cloud_model = as_ref(ctx);
                 let enum_variants_map = argument_index_to_object_id_map
                     .iter()
                     .filter_map(|(index, object_id)| {
@@ -8739,7 +8739,7 @@ impl Input {
     /// Builds a prefix for applying env vars to a command in the current session.
     fn env_vars_command_prefix(&self, env_vars_id: &SyncId, ctx: &AppContext) -> Option<String> {
         let shell_type = self.active_session(ctx)?.shell().shell_type();
-        let env_vars = &CloudModel::as_ref(ctx)
+        let env_vars = &as_ref(ctx)
             .get_env_var_collection(env_vars_id)?
             .model()
             .string_model;
@@ -8792,7 +8792,7 @@ impl Input {
                 // The ID may be `None` if the user is *clearing* environment variables.
                 if let Some(env_vars_id) = env_vars {
                     let env_vars_object =
-                        CloudModel::as_ref(ctx).get_env_var_collection(env_vars_id);
+                        as_ref(ctx).get_env_var_collection(env_vars_id);
                     let telemetry_metadata = EnvVarTelemetryMetadata {
                         object_id: env_vars_id.into_server().map(Into::into),
                         team_uid: env_vars_object
@@ -14181,7 +14181,7 @@ impl Input {
                 command_string.truncate(command_string.trim_end().len());
 
                 if let Some(alias) = WorkflowAliases::as_ref(ctx).match_alias(&command_string) {
-                    if let Some(workflow) = CloudModel::as_ref(ctx).get_workflow(&alias.workflow_id)
+                    if let Some(workflow) = as_ref(ctx).get_workflow(&alias.workflow_id)
                     {
                         let owner = workflow.clone().permissions.owner.into();
 

@@ -1,10 +1,10 @@
-use fuzzy_match::match_indices_case_insensitive;
+
 use ordered_float::OrderedFloat;
 use warpui::{AppContext, Entity, EntityId, SingletonEntity};
 
 use crate::ai::execution_profiles::ExecutionProfileId;
 use crate::ai::execution_profiles::profiles::AIExecutionProfilesModel;
-use crate::cloud_object::model::generic_string_model::StringModel;
+
 use crate::search::SyncDataSource;
 use crate::search::data_source::{Query, QueryResult};
 use crate::search::mixer::DataSourceRunErrorWrapper;

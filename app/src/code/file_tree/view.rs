@@ -39,7 +39,7 @@ use warpui::{
 };
 
 use crate::appearance::Appearance;
-use crate::code::active_file::{ActiveFileEvent, ActiveFileModel};
+use crate::code::active_file::{ActiveFileEvent, Active};
 use crate::code::buffer_location::LocalOrRemotePath;
 use crate::coding_panel_enablement_state::CodingPanelEnablementState;
 use crate::editor::{EditorOptions, EditorView, TextOptions};
@@ -267,7 +267,7 @@ pub struct FileTreeView {
     /// Editor view used for editing (renaming, creating) an item in the tree.
     editor_view: ViewHandle<EditorView>,
     /// Handle to track the currently focused file
-    active_file_model: Option<ModelHandle<ActiveFileModel>>,
+    active_file_model: Option<ModelHandle<Active>>,
     has_terminal_session: bool,
     /// Paths the user explicitly collapsed (per root).
     ///
@@ -729,11 +729,11 @@ impl FileTreeView {
         }
     }
 
-    /// Sets [`ActiveFileModel`] for the [`FileTreeView`] to track
+    /// Sets [`Active`] for the [`FileTreeView`] to track
     /// which files are currently open.
     pub fn set_active_file_model(
         &mut self,
-        active_file_model: ModelHandle<ActiveFileModel>,
+        active_file_model: ModelHandle<Active>,
         ctx: &mut ViewContext<Self>,
     ) {
         // Unsubscribe from old model if any.
@@ -1453,7 +1453,7 @@ impl FileTreeView {
         target_item: &FileTreeEntryState,
         ctx: &mut ViewContext<Self>,
     ) {
-        use crate::remote_server::manager::RemoteServerManager;
+        use crate::manager::RemoteServerManager;
 
         if !FeatureFlag::SshRemoteServer.is_enabled() {
             return;

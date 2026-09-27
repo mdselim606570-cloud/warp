@@ -1,9 +1,9 @@
 use lsp::LspManagerModel;
-use remote_server::proto::TextEdit;
+
 use repo_metadata::RepoMetadataModel;
 use repo_metadata::repositories::DetectedRepositories;
 use repo_metadata::watcher::DirectoryWatcher;
-use warp_files::FileModel;
+
 use warp_util::content_version::ContentVersion;
 use warp_util::host_id::HostId;
 use warp_util::standardized_path::StandardizedPath;
@@ -21,7 +21,7 @@ fn init_app(app: &mut App) {
     app.add_singleton_model(DirectoryWatcher::new);
     app.add_singleton_model(|_| DetectedRepositories::default());
     app.add_singleton_model(RepoMetadataModel::new);
-    app.add_singleton_model(FileModel::new);
+    app.add_singleton_model(::new);
 }
 
 /// Returns the `GlobalBufferModel` singleton handle.
@@ -115,7 +115,7 @@ fn apply_client_edit_accepted_when_version_matches() {
         app.add_singleton_model(GlobalBufferModel::new);
 
         // Open a server-local buffer and manually populate it with content
-        // (simulating what FileModel::FileLoaded would do).
+        // (simulating what ::FileLoaded would do).
         // Keep _buffer_state alive so the WeakModelHandle in GlobalBufferModel
         // can be upgraded (the ModelHandle<Buffer> is the only strong reference).
         let _buffer_state = gbm(&app).update(&mut app, |gbm, ctx| {

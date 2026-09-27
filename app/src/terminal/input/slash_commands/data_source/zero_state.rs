@@ -3,7 +3,7 @@ use warp_core::features::FeatureFlag;
 use warpui::{Entity, ModelHandle, SingletonEntity};
 
 use crate::ai::skills::SkillManager;
-use crate::cloud_object::model::persistence::CloudModel;
+
 use crate::search::SyncDataSource;
 use crate::search::data_source::{Query, QueryResult};
 use crate::search::mixer::DataSourceRunErrorWrapper;
@@ -71,7 +71,7 @@ impl SyncDataSource for GuiZeroStateDataSource {
         }
 
         if is_cloud_mode_v2 && AISettings::as_ref(app).is_any_ai_enabled(app) {
-            let saved_prompts: Vec<_> = CloudModel::as_ref(app)
+            let saved_prompts: Vec<_> = as_ref(app)
                 .get_all_active_workflows()
                 .filter(|cw| cw.model().data.is_agent_mode_workflow())
                 .sorted_by(|a, b| {

@@ -23,7 +23,7 @@ use num_traits::SaturatingSub;
 use pathfinder_color::ColorU;
 use pathfinder_geometry::rect::RectF;
 use pathfinder_geometry::vector::Vector2F;
-use remote_server::manager::RemoteServerManager;
+
 #[cfg(feature = "local_fs")]
 use repo_metadata::repositories::DetectedRepositories;
 use string_offset::CharOffset;
@@ -1756,7 +1756,7 @@ impl LocalCodeEditorView {
 
     /// Save the file to the local file system (or remotely via the remote server).
     /// This will only return an error immediately if there is a failure in the sync part of the call.
-    /// Other errors could be returned asynchronously via the FileModelEvent::FailedToSave event.
+    /// Other errors could be returned asynchronously via the Event::FailedToSave event.
     pub fn save_local(&mut self, ctx: &mut ViewContext<Self>) -> Result<(), ImmediateSaveError> {
         if self.is_remote_disconnected(ctx) {
             return Err(ImmediateSaveError::RemoteDisconnected);

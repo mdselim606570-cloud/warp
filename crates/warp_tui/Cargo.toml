@@ -33,7 +33,6 @@ name = "warp-tui-stable"
 path = "src/bin/stable.rs"
 
 [dependencies]
-ai.workspace = true
 anyhow.workspace = true
 async-channel.workspace = true
 async-fs.workspace = true
@@ -47,7 +46,6 @@ dirs.workspace = true
 futures.workspace = true
 futures-lite.workspace = true
 fs4.workspace = true
-http_client.workspace = true
 instant.workspace = true
 inquire = "0.9.1"
 itertools.workspace = true
@@ -122,7 +120,7 @@ warp_editor = { workspace = true, features = ["test-util"] }
 # Process-level worker-dispatch regression test.
 command.workspace = true
 pathfinder_color.workspace = true
-warp = { workspace = true, features = ["tui", "test-util"] }
+warp = { workspace = true, features = ["tui"] }
 [[bench]]
 name = "transcript_bench"
 harness = false
@@ -136,16 +134,14 @@ required-features = ["test-util"]
 [features]
 # Enables native microphone capture and transcription support. Keep this
 # opt-in so portable Linux builds do not require the host ALSA runtime.
-voice_input = ["warp/voice_input"]
 # Exposes deterministic, production-shaped transcript fixtures to benchmarks.
-test-util = ["warp/test-util", "warp_core/test-util"]
+test-util = ["warp_core/test-util"]
 # Declared so the `warp_channel_config::load_config!` macro's
 # `cfg(feature = "release_bundle")` branch is a known cfg in this crate. Today it
 # stays off and the local bin uses the runtime generator; wiring the embedded
 # config path (a `build.rs`) is phase 2 of the channel setup.
 release_bundle = ["warp/release_bundle"]
 # Enable Rust Sentry reporting without the GUI-only Cocoa SDK.
-crash_reporting = ["warp/crash_reporting"]
 # Self-contained TUI build (the binary is not inside a `.app` bundle). Enables
 # `warp/standalone`, which turns on `warp_core/standalone` so
 # `warp_core::paths::bundled_resources_dir()` resolves the sibling `resources/`

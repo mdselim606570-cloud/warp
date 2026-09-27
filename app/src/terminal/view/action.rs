@@ -3,7 +3,7 @@ use std::ops::Range;
 use std::path::PathBuf;
 
 use ai::skills::SkillReference;
-use command_corrections::Correction;
+
 pub use onboarding::OnboardingIntention;
 use pathfinder_geometry::vector::Vector2F;
 use session_sharing_protocol::common::Role;

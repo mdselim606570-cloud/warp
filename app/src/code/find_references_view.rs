@@ -14,7 +14,7 @@ use warp_core::ui::icons::Icon as WarpIcon;
 use warp_core::ui::theme::color::internal_colors;
 use warp_editor::content::buffer::InitialBufferState;
 use warp_editor::render::element::VerticalExpansionBehavior;
-use warp_files::FileModel;
+
 use warpui::elements::{
     Border, ChildAnchor, ChildView, ClippedScrollStateHandle, ClippedScrollable, ConstrainedBox,
     Container, CornerRadius, CrossAxisAlignment, Fill, Flex, Hoverable, MouseStateHandle,
@@ -262,7 +262,7 @@ impl FindReferencesView {
 
             let file_path_clone = file_path.clone();
             ctx.spawn(
-                async move { FileModel::read_lines_async(&file_path_clone, line_numbers).await },
+                async move { ::read_lines_async(&file_path_clone, line_numbers).await },
                 move |me, result, ctx| {
                     if let Ok(lines) = result {
                         // Build a map from line number to content for quick lookup

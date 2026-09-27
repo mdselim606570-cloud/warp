@@ -87,7 +87,7 @@ impl AsyncDataSource for RepoMenuDataSource {
                     items
                         .into_iter()
                         .filter_map(|item| {
-                            let match_result = fuzzy_match::match_indices_case_insensitive(
+                            let match_result = match_indices_case_insensitive(
                                 &item.display_name,
                                 &query_text,
                             )?;

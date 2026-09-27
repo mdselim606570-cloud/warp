@@ -8,8 +8,8 @@ use warp_completer::completer::{CommandExitStatus, CommandOutput};
 use warp_core::SessionId;
 use warp_core::command::ExitCode;
 
-use crate::remote_server::client::RemoteServerClient;
-use crate::remote_server::proto::{RunCommandErrorCode, run_command_response};
+use crate::client::RemoteServerClient;
+use crate::proto::{RunCommandErrorCode, run_command_response};
 use crate::terminal::model::session::command_executor::{CommandExecutor, ExecuteCommandOptions};
 use crate::terminal::shell::Shell;
 
@@ -17,7 +17,7 @@ use crate::terminal::shell::Shell;
 /// `warp remote-server` process running on the remote host over SSH.
 ///
 /// The executor is always constructed with a live `RemoteServerClient` that
-/// was obtained from [`crate::remote_server::manager::RemoteServerManager`]
+/// was obtained from [`crate::manager::RemoteServerManager`]
 /// after the session reached the `Connected` state. The manager owns the
 /// authoritative per-session client; this executor holds a cloned `Arc` to
 /// the same underlying channels and transitively keeps them alive as long

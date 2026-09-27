@@ -2,7 +2,7 @@ use warp_util::local_or_remote_path::LocalOrRemotePath;
 pub use warp_util::path::*;
 use warpui::{AppContext, SingletonEntity};
 
-use crate::remote_server::manager::RemoteServerManager;
+use crate::manager::RemoteServerManager;
 
 /// Fallback label used when a `RemotePath`'s host is not currently tracked.
 /// Matches the fallback in `terminal::writeable_pty::remote_server_controller::connection_label_from_user_and_host`.

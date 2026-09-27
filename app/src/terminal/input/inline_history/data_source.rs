@@ -7,7 +7,7 @@
 //! - The result is that current session items appear at the bottom (closer to input)
 
 use chrono::{DateTime, Local};
-use fuzzy_match::FuzzyMatchResult;
+
 use ordered_float::OrderedFloat;
 use warpui::{AppContext, Entity, EntityId, ModelHandle, SingletonEntity};
 
@@ -162,7 +162,7 @@ impl InlineHistoryMenuDataSource {
             let match_result = if trimmed_query.is_empty() {
                 None
             } else {
-                let result = fuzzy_match::match_indices_case_insensitive(&title, trimmed_query);
+                let result = match_indices_case_insensitive(&title, trimmed_query);
                 if result.is_none() || result.as_ref().is_some_and(|r| r.score < 50) {
                     continue;
                 }

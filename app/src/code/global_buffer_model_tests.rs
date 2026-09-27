@@ -1,9 +1,9 @@
 use lsp::LspManagerModel;
-use remote_server::proto::TextEdit;
+
 use repo_metadata::RepoMetadataModel;
 use repo_metadata::repositories::DetectedRepositories;
 use repo_metadata::watcher::DirectoryWatcher;
-use warp_files::FileModel;
+
 use warp_util::content_version::ContentVersion;
 use warp_util::host_id::HostId;
 use warp_util::standardized_path::StandardizedPath;
@@ -48,7 +48,7 @@ impl GlobalBufferModel {
         &mut self,
         file_id: warp_util::file::FileId,
         expected_server_version: u64,
-        edits: Vec<remote_server::proto::TextEdit>,
+        edits: Vec<proto::TextEdit>,
         client_version: ContentVersion,
     ) {
         let Some(state) = self.buffers.get_mut(&file_id) else {
@@ -81,7 +81,7 @@ fn init_app(app: &mut App) {
     app.add_singleton_model(DirectoryWatcher::new);
     app.add_singleton_model(|_| DetectedRepositories::default());
     app.add_singleton_model(RepoMetadataModel::new);
-    app.add_singleton_model(FileModel::new);
+    app.add_singleton_model(::new);
 }
 
 fn gbm(app: &App) -> ModelHandle<GlobalBufferModel> {

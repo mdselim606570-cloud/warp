@@ -12,8 +12,8 @@ use crate::ai::execution_profiles::{
 };
 use crate::ai::mcp::TemplatableMCPServerManager;
 use crate::auth::AuthStateProvider;
-use crate::cloud_object::model::persistence::{CloudModel, CloudModelEvent};
-use crate::cloud_object::{Revision, ServerAIExecutionProfile, ServerMetadata, ServerPermissions};
+
+
 use crate::drive::settings::WarpDriveSettings;
 use crate::network::NetworkStatus;
 use crate::server::cloud_objects::update_manager::UpdateManager;
@@ -75,7 +75,7 @@ fn apply_onboarding_settings_preserves_existing_cloud_profile_on_existing_user_l
         app.add_singleton_model(|_| NetworkStatus::new());
         app.add_singleton_model(TeamTesterStatus::mock);
         app.add_singleton_model(UpdateManager::mock);
-        app.add_singleton_model(CloudModel::mock);
+        app.add_singleton_model(mock);
         app.add_singleton_model(|_| TemplatableMCPServerManager::default());
         app.add_singleton_model(PrivacySettings::mock);
         app.add_singleton_model(UserWorkspaces::default_mock);
@@ -110,7 +110,7 @@ fn apply_onboarding_settings_preserves_existing_cloud_profile_on_existing_user_l
         // Insert the existing user's cloud profile via the initial-load
         // path (no per-object events) and emit `InitialLoadCompleted` so
         // `AIExecutionProfilesModel` reconciles to `Synced`.
-        CloudModel::handle(&app).update(&mut app, move |cloud_model, ctx| {
+        handle(&app).update(&mut app, move |cloud_model, ctx| {
             let server_objects: Vec<ServerAIExecutionProfile> = vec![server_object];
             cloud_model.update_objects_from_initial_load(server_objects, false, false, ctx);
             ctx.emit(CloudModelEvent::InitialLoadCompleted);
@@ -192,7 +192,7 @@ fn account_first_settings_enable_agent_for_authenticated_users_and_apply_ui_choi
         app.add_singleton_model(|_| NetworkStatus::new());
         app.add_singleton_model(TeamTesterStatus::mock);
         app.add_singleton_model(UpdateManager::mock);
-        app.add_singleton_model(CloudModel::mock);
+        app.add_singleton_model(mock);
         app.add_singleton_model(|_| TemplatableMCPServerManager::default());
         app.add_singleton_model(PrivacySettings::mock);
         app.add_singleton_model(UserWorkspaces::default_mock);
@@ -256,7 +256,7 @@ fn apply_account_first_onboarding_settings_sets_dollars_for_new_accounts_only() 
         app.add_singleton_model(|_| NetworkStatus::new());
         app.add_singleton_model(TeamTesterStatus::mock);
         app.add_singleton_model(UpdateManager::mock);
-        app.add_singleton_model(CloudModel::mock);
+        app.add_singleton_model(mock);
         app.add_singleton_model(|_| TemplatableMCPServerManager::default());
         app.add_singleton_model(PrivacySettings::mock);
         app.add_singleton_model(UserWorkspaces::default_mock);
@@ -335,7 +335,7 @@ fn apply_onboarding_settings_gates_third_party_ai_on_account() {
         app.add_singleton_model(|_| NetworkStatus::new());
         app.add_singleton_model(TeamTesterStatus::mock);
         app.add_singleton_model(UpdateManager::mock);
-        app.add_singleton_model(CloudModel::mock);
+        app.add_singleton_model(mock);
         app.add_singleton_model(|_| TemplatableMCPServerManager::default());
         app.add_singleton_model(PrivacySettings::mock);
         app.add_singleton_model(UserWorkspaces::default_mock);

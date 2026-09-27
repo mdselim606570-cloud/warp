@@ -81,8 +81,8 @@ use crate::auth::auth_manager::AuthManager;
 use crate::auth::auth_view_modal::AuthViewVariant;
 use crate::banner::{Banner, BannerEvent, BannerState, BannerTextContent, DismissalType};
 use crate::channel::{Channel, ChannelState};
-use crate::cloud_object::Space;
-use crate::code::active_file::ActiveFileModel;
+
+use crate::code::active_file::Active;
 use crate::code::buffer_location::LocalOrRemotePath;
 #[cfg(feature = "local_fs")]
 use crate::code::editor_management::CodeSource;
@@ -904,7 +904,7 @@ pub struct PaneGroup {
     /// Parent modal that holds views to role request/response and role grant modals.
     shared_session_role_change_modal: ViewHandle<RoleChangeModal>,
     /// Model that tracks the currently active file.
-    active_file_model: ModelHandle<ActiveFileModel>,
+    active_file_model: ModelHandle<Active>,
     /// If there is an open summarization cancel dialog, the terminal pane ID where summarization is active.
     terminal_with_open_summarization_dialog: Option<TerminalPaneId>,
 
@@ -1176,7 +1176,7 @@ impl PaneGroup {
             .any(|pane_id| pane_id.is_code_pane())
     }
 
-    pub fn active_file_model(&self) -> &ModelHandle<ActiveFileModel> {
+    pub fn active_file_model(&self) -> &ModelHandle<Active> {
         &self.active_file_model
     }
 
@@ -3164,7 +3164,7 @@ impl PaneGroup {
             },
         );
 
-        let active_file_model = ctx.add_model(|_| ActiveFileModel::new());
+        let active_file_model = ctx.add_model(|_| Active::new());
 
         let mut pane_group = Self {
             tips_completed,

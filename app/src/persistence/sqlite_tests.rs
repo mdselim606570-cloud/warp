@@ -21,7 +21,7 @@ use crate::app_state::{
     TabGroupSnapshot, TabSnapshot, TerminalPaneSnapshot, WindowSnapshot,
 };
 use crate::auth::UserUid;
-use crate::cloud_object::{CloudObjectPermissions, Owner};
+
 use crate::code::editor_management::CodeSource;
 use crate::notebooks::{CloudNotebook, CloudNotebookModel};
 use crate::persistence::model::ObjectPermissions;
@@ -86,7 +86,7 @@ fn remote_server_daemon_scope_database_path_uses_identity_data_dir() {
         identity_key: "user@example.com/ssh host".to_string(),
     });
     let expected_data_dir =
-        remote_server::setup::remote_server_daemon_data_dir("user@example.com/ssh host");
+        setup::remote_server_daemon_data_dir("user@example.com/ssh host");
 
     assert!(path.is_absolute());
     assert_eq!(
@@ -100,7 +100,7 @@ fn remote_server_daemon_scope_database_path_handles_empty_identity_key() {
     let path = database_file_path_for_scope(&PersistenceScope::RemoteServerDaemon {
         identity_key: String::new(),
     });
-    let expected_data_dir = remote_server::setup::remote_server_daemon_data_dir("");
+    let expected_data_dir = setup::remote_server_daemon_data_dir("");
 
     assert_eq!(
         path,

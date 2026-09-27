@@ -20,9 +20,9 @@ use super::ai::{CustomEndpoints, ExecutionProfiles};
 use super::cloud_preferences::{CloudPreferencesSettings, CloudPreferencesSettingsChangedEvent};
 use super::manager::SettingsEvent;
 use crate::auth::auth_state::AuthState;
-use crate::cloud_object::model::generic_string_model::GenericStringObjectId;
-use crate::cloud_object::model::persistence::CloudModel;
-use crate::cloud_object::{CloudObjectEventEntrypoint, GenericStringObjectFormat, JsonObjectType};
+
+
+
 use crate::drive::CloudObjectTypeAndId;
 use crate::server::cloud_objects::update_manager::{
     GenericStringObjectInput, InitiatedBy, UpdateManager, UpdateManagerEvent,
@@ -340,7 +340,7 @@ impl CloudPreferencesSyncer {
             // env var collections, workflow enums, MCP servers, etc.
             // Only preference changes should update the stored hash.
             let sync_id = SyncId::ServerId(server_id);
-            let is_preference = CloudModel::as_ref(ctx)
+            let is_preference = as_ref(ctx)
                 .get_all_cloud_preferences_by_storage_key()
                 .values()
                 .any(|pref| pref.id == sync_id);
@@ -389,7 +389,7 @@ impl CloudPreferencesSyncer {
                 Timer::after(Self::RETRY_POLL).await;
             },
             |me, _, ctx| {
-                let ids_to_retry = CloudModel::handle(ctx).update(ctx, |cloud_model, _ctx| {
+                let ids_to_retry = handle(ctx).update(ctx, |cloud_model, _ctx| {
                     cloud_model
                         .cloud_objects()
                         .filter_map(move |object| {
@@ -507,7 +507,7 @@ impl CloudPreferencesSyncer {
     /// Fixes https://linear.app/warpdotdev/issue/CLD-2629/duplicate-prefs-for-users
     fn ensure_no_duplicate_cloud_prefs(&mut self, ctx: &mut ModelContext<Self>) {
         log::info!("Ensuring no duplicate cloud prefs");
-        let ids_to_delete = CloudModel::handle(ctx).update(ctx, |cloud_model, ctx| {
+        let ids_to_delete = handle(ctx).update(ctx, |cloud_model, ctx| {
             let cloud_prefs = cloud_model
                 .get_all_objects_of_type::<GenericStringObjectId, CloudPreferenceModel>();
 
@@ -610,7 +610,7 @@ impl CloudPreferencesSyncer {
 
         // These are the preferences that the cloud model currently knows about (i.e. the
         // preferences that have been synced to the cloud)
-        let prefs_in_cloud_model = CloudModel::as_ref(ctx)
+        let prefs_in_cloud_model = as_ref(ctx)
             .get_all_cloud_preferences_by_storage_key()
             .keys()
             .cloned()
@@ -692,7 +692,7 @@ impl CloudPreferencesSyncer {
         }
 
         let mut cloud_prefs_to_create = HashMap::new();
-        let cloud_prefs_by_storage_key = CloudModel::as_ref(ctx)
+        let cloud_prefs_by_storage_key = as_ref(ctx)
             .get_all_cloud_preferences_by_storage_key()
             .iter()
             .map(|(storage_key, cloud_pref)| (storage_key.clone(), (*cloud_pref).clone()))
@@ -814,7 +814,7 @@ impl CloudPreferencesSyncer {
                     );
                 }
             }
-            let revision = CloudModel::as_ref(ctx)
+            let revision = as_ref(ctx)
                 .current_revision(&cloud_pref.id)
                 .cloned();
             Some((model, revision, cloud_pref.id))
@@ -887,7 +887,7 @@ impl CloudPreferencesSyncer {
     // Syncs the given cloud pref to local, if cloud syncing is enabled for the pref on this client.
     // Returns early if the pref with the given storage key isn't actually synced to the cloud.
     fn maybe_sync_cloud_pref_to_local(&self, storage_key: &str, ctx: &mut ModelContext<Self>) {
-        let Some(model) = CloudModel::as_ref(ctx)
+        let Some(model) = as_ref(ctx)
             .get_all_cloud_preferences_by_storage_key()
             .get(storage_key)
             .filter(|object| !object.metadata.pending_changes_statuses.pending_delete)

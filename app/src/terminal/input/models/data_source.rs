@@ -1,4 +1,4 @@
-use fuzzy_match::{FuzzyMatchResult, match_indices_case_insensitive};
+
 use itertools::Itertools;
 use markdown_parser::{FormattedText, FormattedTextFragment, FormattedTextLine};
 use ordered_float::OrderedFloat;

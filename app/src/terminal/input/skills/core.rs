@@ -1,5 +1,5 @@
 use ai::skills::{SkillProvider, SkillReference, SkillScope};
-use fuzzy_match::{FuzzyMatchResult, match_indices_case_insensitive};
+
 use ordered_float::OrderedFloat;
 use warp_core::ui::icons::Icon;
 use warp_util::local_or_remote_path::LocalOrRemotePath;
