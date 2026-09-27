@@ -78,9 +78,9 @@ use block_banner::{WarpifyBannerState, render_warpification_banner};
 use block_onboarding::onboarding_drive_sharing_block::OnboardingDriveSharingBlock;
 use bookmarks::render_floating_block_snapshot;
 use chrono::{DateTime, Local, NaiveDateTime};
-use command_corrections::rules::generic::history::History as CommandCorrectionsHistoryRule;
-use command_corrections::rules::{Rule, RuleId as CommandCorrectionsRuleId};
-use command_corrections::{Command, Correction, HistoryItem, SessionMetadata, correct_command};
+
+
+
 use enclose::enclose;
 pub use init::{
     CANCEL_COMMAND_KEYBINDING, TOGGLE_AUTOEXECUTE_MODE_KEYBINDING,
@@ -304,9 +304,9 @@ use crate::banner::{
     Banner, BannerAction, BannerEvent, BannerState, BannerTextButton, BannerTextContent,
     DismissalType,
 };
-use crate::cloud_object::model::actions::ObjectActionType;
-use crate::cloud_object::model::persistence::CloudModel;
-use crate::cloud_object::{CloudObject, GenericStringObjectFormat, JsonObjectType};
+
+
+
 #[cfg(feature = "local_fs")]
 use crate::code::editor_management::CodeSource;
 #[cfg(feature = "local_fs")]
@@ -345,7 +345,7 @@ use crate::pane_group::{
 };
 use crate::persistence::{self, FinishedCommandMetadata};
 use crate::projects::ProjectManagementModel;
-use crate::remote_server::manager::{
+use crate::manager::{
     RemoteServerInitPhase, RemoteServerManager, RemoteServerManagerEvent,
 };
 use crate::resource_center::{
@@ -4633,7 +4633,7 @@ impl TerminalView {
                             );
                             me.show_ssh_remote_server_failed_banner(
                                 *session_id,
-                                remote_server::transport::UserFacingError {
+                                transport::UserFacingError {
                                     body: "Failed to start SSH extension".into(),
                                     detail: if error.is_empty() {
                                         None
@@ -4664,7 +4664,7 @@ impl TerminalView {
                         if *was_reconnect_attempt {
                             send_telemetry_from_ctx!(
                                 TelemetryEvent::RemoteServerReconnectExhausted {
-                                    attempts: remote_server::manager::MAX_RECONNECT_ATTEMPTS,
+                                    attempts: manager::MAX_RECONNECT_ATTEMPTS,
                                     remote_os,
                                     remote_arch,
                                     exit_code: exit_status.as_ref().and_then(|s| s.code),
@@ -4718,7 +4718,7 @@ impl TerminalView {
                             me.show_ssh_remote_server_failed_banner(
                                 *session_id,
                                 error.user_facing_error(
-                                    remote_server::transport::SetupStage::InstallBinary,
+                                    transport::SetupStage::InstallBinary,
                                 ),
                                 ctx,
                             );
@@ -4753,7 +4753,7 @@ impl TerminalView {
                             me.show_ssh_remote_server_failed_banner(
                                 *session_id,
                                 error.user_facing_error(
-                                    remote_server::transport::SetupStage::CheckBinary,
+                                    transport::SetupStage::CheckBinary,
                                 ),
                                 ctx,
                             );
@@ -7914,7 +7914,7 @@ impl TerminalView {
                     })
                     .and_then(|citation| {
                         if let AIAgentCitation::WarpDriveObject { uid } = citation {
-                            CloudModel::as_ref(ctx).get_workflow_by_uid(&uid)
+                            as_ref(ctx).get_workflow_by_uid(&uid)
                         } else {
                             None
                         }
@@ -13498,7 +13498,7 @@ impl TerminalView {
                 // ssh can exit cleanly instead of hanging.
                 #[cfg(not(target_family = "wasm"))]
                 if FeatureFlag::SshRemoteServer.is_enabled() {
-                    use crate::remote_server::manager::RemoteServerManager;
+                    use crate::manager::RemoteServerManager;
                     RemoteServerManager::handle(ctx).update(
                         ctx,
                         |mgr: &mut RemoteServerManager, ctx| {
@@ -13659,7 +13659,7 @@ impl TerminalView {
     fn show_ssh_remote_server_failed_banner(
         &mut self,
         session_id: SessionId,
-        error: remote_server::transport::UserFacingError,
+        error: transport::UserFacingError,
         ctx: &mut ViewContext<Self>,
     ) {
         let already_present = self.rich_content_views.iter().any(|view| {
@@ -21288,7 +21288,7 @@ impl TerminalView {
                 ctx.emit(Event::OpenAIFactCollection { sync_id: *sync_id });
             }
             AIBlockEvent::OpenWorkflow { sync_id } => {
-                if let Some(object) = CloudModel::as_ref(ctx).get_workflow(sync_id) {
+                if let Some(object) = as_ref(ctx).get_workflow(sync_id) {
                     ctx.emit(Event::OpenWarpDriveObjectInPane(object.uid()));
                 }
             }

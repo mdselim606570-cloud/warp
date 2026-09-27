@@ -1,6 +1,6 @@
 //! Data source for the inline plan menu.
 
-use fuzzy_match::match_indices_case_insensitive;
+
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use warpui::{AppContext, Entity, SingletonEntity};

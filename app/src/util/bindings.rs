@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 use enum_iterator::{Sequence, all};
-use fuzzy_match::match_indices_case_insensitive;
+
 use itertools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;

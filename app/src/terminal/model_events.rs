@@ -12,7 +12,7 @@ use super::model::lifecycle::LifecycleTelemetryEvent;
 use super::model::session::{IsSSHWrapperSession, SessionId, SessionInfo};
 use super::model::terminal_model::{CommandType, ExitReason, HandlerEvent};
 use crate::features::FeatureFlag;
-use crate::remote_server::manager::RemoteServerManager;
+use crate::manager::RemoteServerManager;
 use crate::server::telemetry::ImageProtocol;
 use crate::terminal::ClipboardType;
 use crate::terminal::event::{

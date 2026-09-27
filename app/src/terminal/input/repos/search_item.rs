@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use fuzzy_match::FuzzyMatchResult;
+
 use ordered_float::OrderedFloat;
 use warp_core::ui::Icon;
 use warp_core::ui::theme::{AnsiColorIdentifier, Fill};

@@ -6,13 +6,12 @@ use anyhow::Result;
 use warp_core::channel::{Channel, ChannelState};
 use warp_core::features;
 
-// Simple wrapper around warp::run() for dev channel builds.
+// Cognix v1: Local terminal only. No cloud or product features.
 fn main() -> Result<()> {
     ChannelState::set(
         ChannelState::new(Channel::Dev, warp_channel_config::load_config!("dev"))
             .with_additional_features(features::DEBUG_FLAGS)
-            .with_additional_features(features::DOGFOOD_FLAGS)
-            .with_additional_features(features::PREVIEW_FLAGS),
+            .with_additional_features(features::LOCAL_FLAGS),
     );
 
     warp::run()

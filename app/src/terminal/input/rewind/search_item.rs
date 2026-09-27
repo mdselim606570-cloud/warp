@@ -1,7 +1,7 @@
 //! SearchItem implementation for rewind menu items.
 //! Renders two lines: query text and code changes summary.
 
-use fuzzy_match::FuzzyMatchResult;
+
 use ordered_float::OrderedFloat;
 use warp_core::ui::Icon;
 use warp_core::ui::color::coloru_with_opacity;

@@ -15,14 +15,11 @@ use settings::Setting as _;
 use warp_core::channel::ChannelState;
 use warpui::{AppContext, ModelContext, SingletonEntity, ViewHandle, WindowId};
 
-use crate::drive::settings::WarpDriveSettings;
 use crate::features::FeatureFlag;
 use crate::local_control::LocalControlBridge;
 use crate::local_control::resolver::{reject_target_families, require_active_window_id_for_action};
 use crate::pane_group::{PaneGroup, PaneId};
 use crate::settings::{AISettings, CodeSettings};
-use crate::workspace::Workspace;
-use crate::workspace::tab_settings::TabSettings;
 
 #[derive(Serialize)]
 struct InstanceResponse<'a> {
@@ -175,7 +172,6 @@ impl SurfaceDestination {
             Self::CommandSearch => "command_search",
             Self::ThemePicker => "theme_picker",
             Self::Keybindings => "keybindings",
-            Self::WarpDrive => "warp_drive",
             Self::ResourceCenter => "resource_center",
             Self::AiAssistant => "ai_assistant",
             Self::CodeReview => "code_review",
@@ -312,10 +308,8 @@ pub(crate) fn surface_unavailable_reason(
         | SurfaceDestination::ThemePicker
         | SurfaceDestination::Keybindings
         | SurfaceDestination::ResourceCenter => None,
-        SurfaceDestination::WarpDrive if !WarpDriveSettings::is_warp_drive_enabled(ctx) => {
             Some("Warp Drive is disabled")
         }
-        SurfaceDestination::WarpDrive => None,
         SurfaceDestination::AiAssistant if !AISettings::as_ref(ctx).is_any_ai_enabled(ctx) => {
             Some("AI features are disabled")
         }
@@ -354,7 +348,6 @@ pub(crate) fn surface_unavailable_reason(
                 && surface_unavailable_reason(SurfaceDestination::GlobalSearch, ctx).is_some()
                 && surface_unavailable_reason(SurfaceDestination::ConversationList, ctx)
                     .is_some()
-                && surface_unavailable_reason(SurfaceDestination::WarpDrive, ctx).is_some() =>
         {
             Some("the left panel has no available views")
         }

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use ai::skills::SkillProvider;
-use fuzzy_match::FuzzyMatchResult;
+
 use ordered_float::OrderedFloat;
 #[cfg(not(target_family = "wasm"))]
 use repo_metadata::repositories::DetectedRepositories;
@@ -18,7 +18,7 @@ use crate::ai::agent_conversations_model::{AgentConversationsModel, AgentConvers
 use crate::ai::blocklist::block::cli_controller::{CLISubagentController, CLISubagentEvent};
 use crate::ai::blocklist::{BlocklistAIHistoryEvent, BlocklistAIHistoryModel};
 use crate::ai::skills::{SkillDescriptor, SkillManager};
-use crate::search::slash_command_menu::fuzzy_match::SlashCommandFuzzyMatchResult;
+use crate::search::slash_command_menu::SlashCommandFuzzyMatchResult;
 use crate::search::slash_command_menu::static_commands::{Availability, commands};
 use crate::search::slash_command_menu::{SlashCommandId, StaticCommand};
 use crate::settings::{

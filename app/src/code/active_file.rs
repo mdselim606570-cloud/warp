@@ -1,11 +1,11 @@
-//! Module containing the definition of [`ActiveFileModel`],
+//! Module containing the definition of [`Active`],
 //! which tracks the currently focused file across an entire PaneGroup.
 
 use warpui::{Entity, ModelContext};
 
 use super::buffer_location::LocalOrRemotePath;
 
-/// Events emitted by the ActiveFileModel.
+/// Events emitted by the Active.
 #[derive(Debug, Clone)]
 pub enum ActiveFileEvent {
     /// A new file became focused.
@@ -14,16 +14,16 @@ pub enum ActiveFileEvent {
 
 /// Model that tracks the currently focused file.
 #[derive(Default)]
-pub struct ActiveFileModel {
+pub struct Active {
     /// The currently focused file, if any.
     active_file: Option<LocalOrRemotePath>,
 }
 
-impl Entity for ActiveFileModel {
+impl Entity for Active {
     type Event = ActiveFileEvent;
 }
 
-impl ActiveFileModel {
+impl Active {
     pub fn new() -> Self {
         Self::default()
     }

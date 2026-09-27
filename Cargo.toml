@@ -13,7 +13,6 @@ default-members = [
   "crates/channel_versions",
   "crates/command",
   "crates/editor",
-  "crates/graphql",
   "crates/markdown_parser",
   "crates/sum_tree",
   "crates/warpui",
@@ -29,43 +28,21 @@ publish = false
 
 [workspace.dependencies]
 # Local workspace crates. This lets us reference them in other crates without specifying a path.
-ai = { path = "crates/ai" }
-ai_types = { path = "crates/ai_types" }
 app-installation-detection = { path = "crates/app-installation-detection" }
 asset_cache = { path = "crates/asset_cache" }
 asset_macro = { path = "crates/asset_macro" }
 build_cache = { path = "crates/build_cache" }
 channel_versions = { path = "crates/channel_versions", default-features = false }
 command = { path = "crates/command" }
-cloud_objects = { path = "crates/cloud_objects" }
-cloud_object_client = { path = "crates/cloud_object_client" }
-cloud_object_persistence = { path = "crates/cloud_object_persistence" }
-cloud_object_models = { path = "crates/cloud_object_models" }
-computer_use = { path = "crates/computer_use" }
 field_mask = { path = "crates/field_mask" }
-firebase = { path = "crates/firebase" }
 fuzzy_match = { path = "crates/fuzzy_match" }
-handlebars = { path = "crates/handlebars" }
-http_client = { path = "crates/http_client" }
-http_server = { path = "crates/http_server" }
 input_classifier = { path = "crates/input_classifier" }
-integration = { path = "crates/integration" }
 ipc = { path = "crates/ipc" }
 ipynb_parser = { path = "crates/ipynb_parser" }
-jsonrpc = { path = "crates/jsonrpc" }
 languages = { path = "crates/languages" }
-local_control = { path = "crates/local_control" }
-lsp = { path = "crates/lsp" }
 markdown_parser = { path = "crates/markdown_parser" }
-mcp = { path = "crates/mcp" }
 natural_language_detection = { path = "crates/natural_language_detection" }
-node_runtime = { path = "crates/node_runtime" }
-onboarding = { path = "crates/onboarding" }
-persistence = { path = "crates/persistence" }
-prevent_sleep = { path = "crates/prevent_sleep" }
 regex_dfas = { path = "crates/regex_dfas" }
-remote_server = { path = "crates/remote_server" }
-repo_metadata = { path = "crates/repo_metadata" }
 secret_redaction = { path = "crates/secret_redaction" }
 settings = { path = "crates/settings" }
 settings_value = { path = "crates/settings_value", default-features = false }
@@ -74,10 +51,8 @@ simple_logger = { path = "crates/simple_logger" }
 string-offset = { path = "crates/string-offset" }
 sum_tree = { path = "crates/sum_tree" }
 syntax_tree = { path = "crates/syntax_tree" }
-ui_components = { path = "crates/ui_components" }
 vim = { path = "crates/vim" }
 virtual-fs = { path = "crates/virtual_fs" }
-voice_input = { path = "crates/voice_input" }
 warp = { path = "app" }
 warp_assets = { path = "crates/warp_assets" }
 warp_channel_config = { path = "crates/warp_channel_config" }
@@ -88,24 +63,18 @@ warp_editor = { path = "crates/editor" }
 warp_errors = { path = "crates/warp_errors" }
 warp_features = { path = "crates/warp_features" }
 warp_files = { path = "crates/warp_files" }
-warp_graphql = { path = "crates/graphql" }
-warp_graphql_schema = { path = "crates/warp_graphql_schema" }
-warp_harness_usage = { path = "crates/warp_harness_usage" }
-warp_isolation_platform = { path = "crates/isolation_platform" }
 warp_logging = { path = "crates/warp_logging" }
-warp_managed_secrets = { path = "crates/managed_secrets" }
-warp_multi_agent_client = { path = "crates/warp_multi_agent_client" }
 warp_ripgrep = { path = "crates/warp_ripgrep" }
+warp_isolation_platform = { path = "crates/isolation_platform" }
+repo_metadata = { path = "crates/repo_metadata" }
+watcher = { path = "crates/watcher" }
 warp_search_core = { path = "crates/warp_search_core" }
-warp_server_auth = { path = "crates/warp_server_auth" }
-warp_server_client = { path = "crates/warp_server_client" }
 warp_terminal = { path = "crates/warp_terminal" }
 warp_util = { path = "crates/warp_util" }
 warp_web_event_bus = { path = "crates/warp_web_event_bus" }
 warpui = { path = "crates/warpui" }
 warpui_core = { path = "crates/warpui_core" }
 warpui_extras = { path = "crates/warpui_extras", default-features = false }
-watcher = { path = "crates/watcher" }
 websocket = { path = "crates/websocket" }
 
 # Workspace-level dependencies used by multiple crates. Prefer adding dependencies

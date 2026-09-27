@@ -43,8 +43,8 @@ use crate::ai::cloud_environments::{
 };
 use crate::ai::llms::LLMId;
 use crate::auth::user::TEST_USER_UID;
-use crate::cloud_object::model::persistence::CloudModel;
-use crate::cloud_object::{CloudObjectMetadata, CloudObjectPermissions};
+
+
 use crate::code_review::comments::{
     AttachedReviewComment, AttachedReviewCommentTarget, CommentOrigin,
 };
@@ -3450,7 +3450,7 @@ fn register_test_cloud_environment(app: &mut App) -> SyncId {
             CloudObjectMetadata::mock(),
             CloudObjectPermissions::mock_personal(),
         );
-        CloudModel::handle(ctx).update(ctx, |model, ctx| {
+        handle(ctx).update(ctx, |model, ctx| {
             model.create_object(sync_id, object, ctx);
         });
     });

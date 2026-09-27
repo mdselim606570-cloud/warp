@@ -9,7 +9,7 @@ use bimap::BiMap;
 use futures_util::stream::AbortHandle;
 use lsp::types::TextDocumentContentChangeEvent;
 use lsp::{LspManagerModel, LspServerLogLevel, LspServerModel};
-use remote_server::manager::RemoteServerManager;
+
 use string_offset::{ByteOffset, CharOffset};
 use vec1::vec1;
 use warp_core::features::FeatureFlag;
@@ -31,7 +31,7 @@ use super::buffer_location::{LocalOrRemotePath, SyncClock};
 cfg_if::cfg_if! {
     if #[cfg(feature = "local_fs")] {
         use lsp::LspManagerModelEvent;
-        use warp_files::{FileModelEvent, FileModel};
+        
         use warp_editor::content::text::IndentBehavior;
         use warp_editor::content::text::IndentUnit;
         use warp_editor::content::buffer::EditOrigin;
@@ -68,7 +68,7 @@ struct PendingEditBatch {
     expected_server_version: u64,
     /// Accumulated `TextEdit`s — each edit's offsets reference the buffer state
     /// AFTER all previous edits in this batch have been applied.
-    edits: Vec<remote_server::proto::TextEdit>,
+    edits: Vec<proto::TextEdit>,
     /// The client version to send (updated on each append).
     latest_client_version: ContentVersion,
     /// Handle to cancel the debounce timer when a new edit arrives or the
@@ -83,7 +83,7 @@ impl PendingEditBatch {
     /// Note: `send_buffer_edit` uses best-effort `try_send` on an unbounded
     /// channel, so it can only fail if the connection is closed (in which
     /// case the subsequent `save_buffer` would also fail).
-    fn flush(self, client: &remote_server::client::RemoteServerClient, path: &str) {
+    fn flush(self, client: &client::RemoteServerClient, path: &str) {
         if let Some(timer) = &self.debounce_timer {
             timer.abort();
         }
@@ -325,7 +325,7 @@ pub struct GlobalBufferModel {
 impl GlobalBufferModel {
     pub fn new(_ctx: &mut ModelContext<Self>) -> Self {
         #[cfg(feature = "local_fs")]
-        _ctx.subscribe_to_model(&FileModel::handle(_ctx), Self::handle_file_model_events);
+        _ctx.subscribe_to_model(&::handle(_ctx), Self::handle_file_model_events);
 
         #[cfg(feature = "local_fs")]
         _ctx.subscribe_to_model(
@@ -336,7 +336,7 @@ impl GlobalBufferModel {
         // Subscribe to remote buffer updates from the RemoteServerManager.
         #[cfg(feature = "local_tty")]
         if FeatureFlag::SshRemoteServer.is_enabled() {
-            use remote_server::manager::{RemoteServerManager, RemoteServerManagerEvent};
+            
             let mgr = RemoteServerManager::handle(_ctx);
             _ctx.subscribe_to_model(&mgr, |me, _, event, ctx| match event {
                 RemoteServerManagerEvent::BufferUpdated {
@@ -416,7 +416,7 @@ impl GlobalBufferModel {
 
             #[cfg(feature = "local_fs")]
             {
-                let file_model = FileModel::handle(ctx);
+                let file_model = ::handle(ctx);
                 file_model.update(ctx, |file_model, ctx| {
                     file_model.cancel(id);
                     file_model.unsubscribe(id, ctx);
@@ -444,7 +444,7 @@ impl GlobalBufferModel {
 
         #[cfg(feature = "local_fs")]
         {
-            let file_model = FileModel::handle(_ctx);
+            let file_model = ::handle(_ctx);
             file_model.update(_ctx, |file_model, ctx| {
                 file_model.cancel(file_id);
                 file_model.unsubscribe(file_id, ctx);
@@ -480,7 +480,7 @@ impl GlobalBufferModel {
     /// For initial load (is_loaded_from_file_system == true), this is synchronous.
     /// For auto-reload (is_loaded_from_file_system == false), this spawns a background task for diff computation.
     /// Exposed as `pub(crate)` so tests can populate buffer content
-    /// without going through the async `FileModel` load path.
+    /// without going through the async `` load path.
     pub(crate) fn populate_buffer_with_read_content(
         &mut self,
         file_id: FileId,
@@ -679,12 +679,12 @@ impl GlobalBufferModel {
     #[cfg(feature = "local_fs")]
     fn handle_file_model_events(
         &mut self,
-        _: ModelHandle<FileModel>,
-        event: &FileModelEvent,
+        _: ModelHandle<>,
+        event: &Event,
         ctx: &mut ModelContext<Self>,
     ) {
         match event {
-            FileModelEvent::FileLoaded {
+            Event::FileLoaded {
                 content,
                 id,
                 version,
@@ -697,13 +697,13 @@ impl GlobalBufferModel {
                 // For initial load, base_version and new_version are the same
                 self.populate_buffer_with_read_content(*id, content, *version, *version, true, ctx);
             }
-            FileModelEvent::FailedToLoad { id, error } => {
+            Event::FailedToLoad { id, error } => {
                 ctx.emit(GlobalBufferModelEvent::FailedToLoad {
                     file_id: *id,
                     error: error.clone(),
                 });
             }
-            FileModelEvent::FileUpdated {
+            Event::FileUpdated {
                 id,
                 content,
                 base_version,
@@ -777,7 +777,7 @@ impl GlobalBufferModel {
                     }
                 }
             }
-            FileModelEvent::FileSaved { id, version } => {
+            Event::FileSaved { id, version } => {
                 // Make sure base content version is updated after a save is performed.
                 // This avoids us flagging the incoming update from file watcher as conflict changes.
                 if let Some(state) = self.buffers.get_mut(id) {
@@ -788,7 +788,7 @@ impl GlobalBufferModel {
                     content_version: *version,
                 });
             }
-            FileModelEvent::FailedToSave { id, error } => {
+            Event::FailedToSave { id, error } => {
                 ctx.emit(GlobalBufferModelEvent::FailedToSave {
                     file_id: *id,
                     error: error.clone(),
@@ -799,7 +799,7 @@ impl GlobalBufferModel {
 
     /// Save the content of a tracked buffer.
     ///
-    /// For local buffers, saves to disk via `FileModel`.
+    /// For local buffers, saves to disk via ``.
     /// For remote buffers, flushes any pending edit batch first, then sends
     /// a `SaveBuffer` RPC to the remote server.
     #[cfg(feature = "local_fs")]
@@ -859,15 +859,15 @@ impl GlobalBufferModel {
             return Ok(());
         }
 
-        // Completion is observed via `FileModelEvent`s; drop the save future.
-        FileModel::handle(ctx)
+        // Completion is observed via `Event`s; drop the save future.
+        ::handle(ctx)
             .update(ctx, |file_model, ctx| {
                 file_model.save(file_id, content, version, ctx)
             })
             .map(drop)
     }
 
-    /// Rename a file and save its content via FileModel.
+    /// Rename a file and save its content via .
     #[cfg(feature = "local_fs")]
     pub fn rename_and_save(
         &self,
@@ -877,15 +877,15 @@ impl GlobalBufferModel {
         version: ContentVersion,
         ctx: &mut ModelContext<Self>,
     ) -> Result<(), FileSaveError> {
-        // Completion is observed via `FileModelEvent`s; drop the save future.
-        FileModel::handle(ctx)
+        // Completion is observed via `Event`s; drop the save future.
+        ::handle(ctx)
             .update(ctx, |file_model, ctx| {
                 file_model.rename_and_save(file_id, new_path, content, version, ctx)
             })
             .map(drop)
     }
 
-    /// Delete a file via FileModel.
+    /// Delete a file via .
     #[cfg(feature = "local_fs")]
     pub fn delete(
         &self,
@@ -893,15 +893,15 @@ impl GlobalBufferModel {
         version: ContentVersion,
         ctx: &mut ModelContext<Self>,
     ) -> Result<(), FileSaveError> {
-        // Completion is observed via `FileModelEvent`s; drop the delete future.
-        FileModel::handle(ctx)
+        // Completion is observed via `Event`s; drop the delete future.
+        ::handle(ctx)
             .update(ctx, |file_model, ctx| {
                 file_model.delete(file_id, version, ctx)
             })
             .map(drop)
     }
 
-    /// Remove a tracked buffer, cleaning up FileModel and LSP state.
+    /// Remove a tracked buffer, cleaning up  and LSP state.
     /// Used when a new file is deleted before ever being saved to a permanent location.
     pub fn remove(&mut self, file_id: FileId, ctx: &mut ModelContext<Self>) {
         self.cleanup_file_id(file_id, ctx);
@@ -932,7 +932,7 @@ impl GlobalBufferModel {
         {
             let path_clone = path.to_path_buf();
             ctx.spawn(
-                async move { FileModel::read_content_for_file(&path_clone).await },
+                async move { ::read_content_for_file(&path_clone).await },
                 move |me, content, ctx| match content {
                     Ok(content) => {
                         // Consider this reload as a "new" version. This prevents any race condition when there is another
@@ -946,7 +946,7 @@ impl GlobalBufferModel {
                                 state.buffer.upgrade(ctx).map(|b| b.as_ref(ctx).version())
                             })
                             .unwrap_or(new_version);
-                        FileModel::handle(ctx).update(ctx, |file_model, _ctx| {
+                        ::handle(ctx).update(ctx, |file_model, _ctx| {
                             file_model.set_version(id, new_version);
                         });
                         me.populate_buffer_with_read_content(
@@ -969,7 +969,7 @@ impl GlobalBufferModel {
 
     /// Remap an existing buffer from `old_file_id` to a new path, preserving the buffer
     /// content and unsaved edits. Sends didClose for the old path and re-registers the
-    /// new path with FileModel and LSP.
+    /// new path with  and LSP.
     ///
     /// Used for file rename.
     #[cfg(feature = "local_fs")]
@@ -992,8 +992,8 @@ impl GlobalBufferModel {
             self.close_document_with_lsp(&old_path, ctx);
         }
 
-        // Cancel + unsubscribe old FileId from FileModel.
-        let file_model = FileModel::handle(ctx);
+        // Cancel + unsubscribe old FileId from .
+        let file_model = ::handle(ctx);
         file_model.update(ctx, |file_model, ctx| {
             file_model.cancel(old_file_id);
             file_model.unsubscribe(old_file_id, ctx);
@@ -1027,7 +1027,7 @@ impl GlobalBufferModel {
         )
     }
 
-    /// Shared helper: register `buffer` under `path` with FileModel, subscribe to
+    /// Shared helper: register `buffer` under `path` with , subscribe to
     /// buffer events for LSP sync, store internal state, and open the document with LSP.
     #[cfg(feature = "local_fs")]
     fn register_buffer_for_path(
@@ -1049,7 +1049,7 @@ impl GlobalBufferModel {
         }
 
         let buffer_version = buffer.as_ref(ctx).version();
-        let file_id = FileModel::handle(ctx).update(ctx, |file_model, ctx| {
+        let file_id = ::handle(ctx).update(ctx, |file_model, ctx| {
             let id = file_model.register_file_path(&path, true, ctx);
             file_model.set_version(id, buffer_version);
             id
@@ -1158,7 +1158,7 @@ impl GlobalBufferModel {
     /// Open a local buffer for the given file path.
     ///
     /// If a buffer already exists for this path and is loaded, returns the existing BufferState.
-    /// If no buffer exists, creates a new Buffer and BufferState using FileModel.
+    /// If no buffer exists, creates a new Buffer and BufferState using .
     /// File system updates are automatically subscribed to for all buffers.
     ///
     /// When `is_server_local` is true, the buffer is created with a `ServerLocal`
@@ -1200,10 +1200,10 @@ impl GlobalBufferModel {
         is_server_local: bool,
         ctx: &mut ModelContext<Self>,
     ) -> BufferState {
-        // Open file through FileModel to get FileId
+        // Open file through  to get FileId
         // Always subscribe to updates for GlobalBufferModel created buffers
         let file_id =
-            FileModel::handle(ctx).update(ctx, |file_model, ctx| file_model.open(path, true, ctx));
+            ::handle(ctx).update(ctx, |file_model, ctx| file_model.open(path, true, ctx));
 
         // Create new buffer
         let buffer = ctx.add_model(|_| {
@@ -1718,7 +1718,7 @@ impl GlobalBufferModel {
                     let Some(buffer) = state.buffer.upgrade(ctx) else {
                         return;
                     };
-                    let edits: Vec<remote_server::proto::TextEdit> = delta
+                    let edits: Vec<proto::TextEdit> = delta
                         .precise_deltas
                         .iter()
                         .map(|d| {
@@ -1727,7 +1727,7 @@ impl GlobalBufferModel {
                                 .as_ref(ctx)
                                 .text_in_range(d.resolved_range.clone())
                                 .into_string();
-                            remote_server::proto::TextEdit {
+                            proto::TextEdit {
                                 start_offset: d.replaced_range.start.as_usize() as u64,
                                 end_offset: d.replaced_range.end.as_usize() as u64,
                                 text,
@@ -1807,7 +1807,7 @@ impl GlobalBufferModel {
     fn apply_open_buffer_response(
         &mut self,
         file_id: FileId,
-        result: Result<remote_server::proto::OpenBufferResponse, String>,
+        result: Result<proto::OpenBufferResponse, String>,
         ctx: &mut ModelContext<Self>,
     ) {
         let res = result.and_then(|res| {
@@ -1820,8 +1820,8 @@ impl GlobalBufferModel {
             })
         });
         match res {
-            Ok(remote_server::proto::open_buffer_response::Result::Success(
-                remote_server::proto::OpenBufferSuccess {
+            Ok(proto::open_buffer_response::Result::Success(
+                proto::OpenBufferSuccess {
                     content,
                     server_version,
                 },
@@ -1868,8 +1868,8 @@ impl GlobalBufferModel {
                     content_version: version,
                 });
             }
-            Ok(remote_server::proto::open_buffer_response::Result::Error(
-                remote_server::proto::FileOperationError { message: error },
+            Ok(proto::open_buffer_response::Result::Error(
+                proto::FileOperationError { message: error },
             ))
             | Err(error) => {
                 log::warn!("[remote-buffer] Failed to open remote buffer: {error}");
@@ -1915,7 +1915,7 @@ impl GlobalBufferModel {
     pub fn apply_client_edit(
         &mut self,
         file_id: FileId,
-        edits: &[super::super::remote_server::proto::TextEdit],
+        edits: &[super::super::proto::TextEdit],
         expected_server_version: ContentVersion,
         new_client_version: ContentVersion,
         ctx: &mut ModelContext<Self>,
@@ -1968,7 +1968,7 @@ impl GlobalBufferModel {
     /// Save a server-local buffer to disk.
     ///
     /// Uses the buffer's current `ContentVersion` (not a fresh one) so that
-    /// `FileModel` can detect concurrent modifications between the save
+    /// `` can detect concurrent modifications between the save
     /// request and the disk write completing.
     #[cfg(feature = "local_fs")]
     pub fn save_server_local(
@@ -1984,8 +1984,8 @@ impl GlobalBufferModel {
         };
         let content = buffer.as_ref(ctx).text().into_string();
         let version = buffer.as_ref(ctx).version();
-        // Completion is observed via `FileModelEvent`s; drop the save future.
-        FileModel::handle(ctx)
+        // Completion is observed via `Event`s; drop the save future.
+        ::handle(ctx)
             .update(ctx, |file_model, ctx| {
                 file_model.save(file_id, content, version, ctx)
             })
@@ -2033,8 +2033,8 @@ impl GlobalBufferModel {
         let content = client_content.to_string();
         let save_version = ContentVersion::new();
         state.set_base_content_version(save_version);
-        // Completion is observed via `FileModelEvent`s; drop the save future.
-        FileModel::handle(ctx)
+        // Completion is observed via `Event`s; drop the save future.
+        ::handle(ctx)
             .update(ctx, |file_model, ctx| {
                 file_model.save(file_id, content, save_version, ctx)
             })
@@ -2103,7 +2103,7 @@ impl GlobalBufferModel {
         };
 
         ctx.spawn(
-            async move { FileModel::read_content_for_file(&file_path).await },
+            async move { ::read_content_for_file(&file_path).await },
             move |me, content, ctx| match content {
                 Ok(content) => {
                     let Some(state) = me.buffers.get_mut(&file_id) else {
@@ -2132,7 +2132,7 @@ impl GlobalBufferModel {
                     });
 
                     state.set_base_content_version(new_version);
-                    FileModel::handle(ctx).update(ctx, |file_model, _ctx| {
+                    ::handle(ctx).update(ctx, |file_model, _ctx| {
                         file_model.set_version(file_id, new_version);
                     });
 
@@ -2377,7 +2377,7 @@ impl GlobalBufferModel {
     fn push_edit_to_pending_batch(
         &mut self,
         file_id: FileId,
-        edits: Vec<remote_server::proto::TextEdit>,
+        edits: Vec<proto::TextEdit>,
         _ctx: &mut ModelContext<Self>,
     ) {
         let Some(state) = self.buffers.get_mut(&file_id) else {

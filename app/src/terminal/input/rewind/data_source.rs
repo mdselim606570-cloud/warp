@@ -132,7 +132,7 @@ impl SyncDataSource for RewindDataSource {
             // Filter by search query if present
             if !search_query.is_empty() {
                 let match_result =
-                    fuzzy_match::match_indices_case_insensitive(&query_text, &search_query);
+                    match_indices_case_insensitive(&query_text, &search_query);
                 if let Some(match_result) = match_result {
                     results.push(QueryResult::from(
                         RewindSearchItem::new_rewind_point(exchange.id, query_text, file_changes)

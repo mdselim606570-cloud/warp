@@ -61,8 +61,8 @@ use crate::auth::web_handoff::{WebHandoffEvent, WebHandoffView};
 use crate::auth::{AuthStateProvider, LoginFailureReason};
 use crate::autoupdate::{AutoupdateState, AutoupdateStateEvent, RequestType, UpdateReady};
 use crate::changelog_model::ChangelogRequestType;
-use crate::cloud_object::model::persistence::CloudModel;
-use crate::cloud_object::{GenericStringObjectFormat, JsonObjectType, ObjectType};
+
+
 use crate::drive::export::ExportManager;
 use crate::drive::items::WarpDriveItemId;
 use crate::drive::{CloudObjectTypeAndId, OpenWarpDriveObjectArgs, OpenWarpDriveObjectSettings};
@@ -3121,7 +3121,7 @@ impl RootView {
         ctx: &mut ViewContext<Self>,
     ) -> bool {
         if let AuthOnboardingState::Terminal(handle) = &self.auth_onboarding_state {
-            let cloud_model = CloudModel::as_ref(ctx);
+            let cloud_model = as_ref(ctx);
 
             match arg.object_type {
                 ObjectType::Notebook => {
@@ -3737,7 +3737,7 @@ impl RootView {
 
     fn export_all_warp_drive_objects(&mut self, ctx: &mut ViewContext<Self>) {
         let window_id = ctx.window_id();
-        let cloud_model = CloudModel::as_ref(ctx);
+        let cloud_model = as_ref(ctx);
         let exportable_objects = cloud_model.get_all_exportable_object_ids();
         ExportManager::handle(ctx).update(ctx, move |export_manager, ctx| {
             export_manager.export(window_id, &exportable_objects, ctx);

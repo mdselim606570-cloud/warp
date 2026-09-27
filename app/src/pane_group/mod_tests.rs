@@ -69,8 +69,8 @@ use crate::ai::skills::SkillManager;
 use crate::auth::auth_manager::AuthManager;
 use crate::auth::user::TEST_USER_UID;
 use crate::changelog_model::ChangelogModel;
-use crate::cloud_object::model::persistence::CloudModel;
-use crate::cloud_object::{Owner, Revision, ServerMetadata, ServerPermissions};
+
+
 use crate::context_chips::prompt::Prompt;
 use crate::network::NetworkStatus;
 use crate::notebooks::editor::keys::NotebookKeybindings;
@@ -147,7 +147,7 @@ fn initialize_app_with_history(app: &mut App, conversations: Vec<AgentConversati
     app.add_singleton_model(|_| NetworkStatus::new());
     app.add_singleton_model(|_| SystemStats::new());
     app.add_singleton_model(SyncQueue::mock);
-    app.add_singleton_model(CloudModel::mock);
+    app.add_singleton_model(mock);
     app.add_singleton_model(CloudEnvironmentCatalog::new);
     app.add_singleton_model(UserWorkspaces::default_mock);
     app.add_singleton_model(TeamTesterStatus::mock);
@@ -238,7 +238,7 @@ fn initialize_app_with_history(app: &mut App, conversations: Vec<AgentConversati
     app.add_singleton_model(|_| History::new(vec![]));
     app.add_singleton_model(|_| GitHubAuthNotifier::new());
     app.add_singleton_model(AgentConversationsModel::new);
-    app.add_singleton_model(remote_server::manager::RemoteServerManager::new);
+    app.add_singleton_model(manager::RemoteServerManager::new);
 }
 
 struct MockOptions {
@@ -4045,13 +4045,13 @@ fn test_focused_pane_is_synchronized_with_application_focus() {
 #[cfg(feature = "local_fs")]
 #[test]
 fn test_undo_close_keeps_a_file_pane_watching_its_file() {
-    use warp_files::FileModel;
+    
 
     let _undo_closed_panes = FeatureFlag::UndoClosedPanes.override_enabled(true);
 
     App::test((), |mut app| async move {
         initialize_app(&mut app);
-        app.add_singleton_model(FileModel::new);
+        app.add_singleton_model(::new);
         let pane_group = mock_pane_group(&mut app, Default::default());
 
         let directory = tempfile::tempdir().expect("temp dir");
@@ -4078,7 +4078,7 @@ fn test_undo_close_keeps_a_file_pane_watching_its_file() {
         // Let the read settle so the pane is fully loaded and watching.
         let loaded = file_view.update(&mut app, |view, ctx| {
             let file_id = view.file_id_for_test().expect("the file should be open");
-            let future_handle = FileModel::as_ref(ctx)
+            let future_handle = ::as_ref(ctx)
                 .get_future_handle(file_id)
                 .expect("Loading future should be present");
             ctx.await_spawned_future(future_handle.future_id())
@@ -4105,7 +4105,7 @@ fn test_undo_close_keeps_a_file_pane_watching_its_file() {
                 .file_id_for_test()
                 .expect("a restored pane should still hold its file open");
             assert!(
-                FileModel::as_ref(ctx).file_path(file_id).is_some(),
+                ::as_ref(ctx).file_path(file_id).is_some(),
                 "a restored pane should still be tracked by the file model"
             );
         });

@@ -16,7 +16,7 @@ use super::cloud_preferences_syncer::CloudPreferencesSyncer;
 use crate::ai::blocklist::telemetry_banner::should_collect_ai_ugc_telemetry;
 use crate::auth::AuthStateProvider;
 use crate::auth::auth_state::AuthState;
-use crate::cloud_object::model::persistence::CloudModel;
+
 use crate::server::cloud_objects::update_manager::UpdateManager;
 use crate::server::server_api::ServerApiProvider;
 #[cfg(any(test, feature = "test-util"))]
@@ -726,7 +726,7 @@ impl PrivacySettings {
         // Check if the warp drive preferences are set. If they are, and telemetry and crash reporting
         // are set as warp drive prefs, then use those.  Otherwise, update the warp drive prefs to match
         // the values from the legacy user_settings endpoint so that we can use warp drive prefs going forward.
-        let cloud_model = CloudModel::as_ref(ctx);
+        let cloud_model = as_ref(ctx);
         let cloud_prefs = cloud_model.get_all_cloud_preferences_by_storage_key();
         let cloud_telemetry_value =
             cloud_prefs

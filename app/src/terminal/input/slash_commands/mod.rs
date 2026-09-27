@@ -42,7 +42,7 @@ use crate::ai::blocklist::{
     QueuedQueryId, QueuedQueryModel, QueuedQueryOrigin, SlashCommandRequest,
 };
 use crate::ai::conversation_rename::rename_conversation;
-use crate::cloud_object::model::persistence::CloudModel;
+
 use crate::code_review::telemetry_event::CodeReviewPaneEntrypoint;
 #[cfg(not(target_family = "wasm"))]
 use crate::search::slash_command_menu::static_commands::commands;
@@ -173,7 +173,7 @@ pub fn record_saved_prompt_accepted(is_in_agent_view: bool, ctx: &mut AppContext
 }
 
 pub fn saved_prompt_text_for_id(id: &SyncId, ctx: &AppContext) -> Option<String> {
-    let workflow = CloudModel::as_ref(ctx).get_workflow(id)?;
+    let workflow = as_ref(ctx).get_workflow(id)?;
     workflow.model().data.is_agent_mode_workflow().then(|| {
         compute_workflow_display_data(&workflow.model().data).command_with_replaced_arguments
     })
@@ -406,7 +406,7 @@ impl Input {
                 ctx.notify();
             }
             SlashCommandsEvent::SelectedSavedPrompt { id } => {
-                let Some(workflow) = CloudModel::as_ref(ctx).get_workflow(id).cloned() else {
+                let Some(workflow) = as_ref(ctx).get_workflow(id).cloned() else {
                     log::warn!("Tried to execute workflow for id {id:?} but it does not exist");
                     return;
                 };

@@ -1009,84 +1009,16 @@ static FEATURES_INITIALIZED: AtomicBool = AtomicBool::new(false);
 /// Features used in debugging.
 pub const DEBUG_FLAGS: &[FeatureFlag] = &[FeatureFlag::DebugMode, FeatureFlag::RuntimeFeatureFlags];
 /// Features enabled only for the WarpLocal developer build.
+/// Cognix v1: Terminal-only. No cloud or product flags.
 pub const LOCAL_FLAGS: &[FeatureFlag] = &[FeatureFlag::LocalClaudeCodexChildHarnesses];
 
-/// Features enabled for the development team.  The expectation is that, over
-/// time, these will move on to PREVIEW_FLAGS before being launched.
-pub const DOGFOOD_FLAGS: &[FeatureFlag] = &[
-    FeatureFlag::LogExpensiveFramesInSentry,
-    FeatureFlag::ToggleBootstrapBlock,
-    FeatureFlag::CreatingSharedSessions,
-    FeatureFlag::RemoveAutosuggestionDuringTabCompletions,
-    FeatureFlag::ResizeFix,
-    FeatureFlag::AgentModeWorkflows,
-    FeatureFlag::AgentModeAnalytics,
-    FeatureFlag::LazySceneBuilding,
-    FeatureFlag::SshDragAndDrop,
-    FeatureFlag::MultiWorkspace,
-    FeatureFlag::ImeMarkedText,
-    FeatureFlag::MSYS2Shells,
-    FeatureFlag::RetryTruncatedCodeResponses,
-    FeatureFlag::ContextLineReviewComments,
-    FeatureFlag::RunGeneratorsWithCmdExe,
-    FeatureFlag::Projects,
-    FeatureFlag::ProviderCommand,
-    FeatureFlag::MarkdownImages,
-    FeatureFlag::FileAndDiffSetComments,
-    FeatureFlag::FileGlobV2Warnings,
-    FeatureFlag::SummarizationViaMessageReplacement,
-    FeatureFlag::LocalComputerUse,
-    FeatureFlag::VideoRecording,
-    FeatureFlag::WindowsVideoRecording,
-    FeatureFlag::OzLaunchModal,
-    // These are enabled via 100% experiment on prod warp-server,
-    // but we need to enable here for dogfood builds.
-    FeatureFlag::CrossRepoContext,
-    FeatureFlag::CodebaseIndexPersistence,
-    FeatureFlag::FullSourceCodeEmbedding,
-    FeatureFlag::CodebaseIndexSpeedbump,
-    // End manually enabled Code features.
-    FeatureFlag::EditableMarkdownMermaid,
-    FeatureFlag::CodeReviewScrollPreservation,
-    FeatureFlag::RememberFastForwardState,
-    FeatureFlag::GeminiNotifications,
-    FeatureFlag::LocalDockerSandbox,
-    #[cfg(not(windows))]
-    FeatureFlag::SshRemoteServer,
-    FeatureFlag::RemoteCodebaseIndexing,
-    FeatureFlag::GPTConfigurableContextWindow,
-    FeatureFlag::WarpControlCli,
-    FeatureFlag::TerminalLifecycleRecovery,
-    FeatureFlag::PromptCacheExpiryWarning,
-    FeatureFlag::JupyterNotebookRendering,
-    FeatureFlag::MultiLevelOrchestration,
-    FeatureFlag::McpJsonTreeView,
-    FeatureFlag::BoxDrawingGlyphs,
-    FeatureFlag::PricingTransparency,
-    FeatureFlag::CtrlCCancelsThirdPartyHarness,
-    FeatureFlag::WarpingModelName,
-    FeatureFlag::LrcActivitySignal,
-    FeatureFlag::StoredScreenshots,
-];
-
-/// Features enabled for feature preview build users (e.g.: Friends of Warp).
-/// All PREVIEW_FLAGS are also automatically added to dogfood builds (WarpDev).
-pub const PREVIEW_FLAGS: &[FeatureFlag] = &[FeatureFlag::PeriodicHandoffCheckpoints];
-
 /// Features enabled for all release builds (i.e.: everything but WarpLocal).
-/// NOTE: if you are promoting a feature from Preview to launch, you'll likely
-/// want to enable the feature by default in app/Cargo.toml, rather than add it to RELEASE_FLAGS.
+/// Cognix v1: Terminal-only. No cloud or product flags.
 pub const RELEASE_FLAGS: &[FeatureFlag] = &[
     FeatureFlag::Autoupdate,
     FeatureFlag::Changelog,
     FeatureFlag::CrashReporting,
-    FeatureFlag::VideoRecording,
     FeatureFlag::ImeMarkedText,
-    // Remote server binary is not yet supported on Windows.
-    #[cfg(not(windows))]
-    FeatureFlag::SshRemoteServer,
-    #[cfg(any(target_os = "macos", target_os = "windows"))]
-    FeatureFlag::DragTabsToWindows,
 ];
 
 /// Flags that we want to allow to switch at runtime (assuming RuntimeFeatureFlags is set)

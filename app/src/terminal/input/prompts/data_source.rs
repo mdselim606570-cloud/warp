@@ -1,4 +1,4 @@
-use fuzzy_match::FuzzyMatchResult;
+
 use ordered_float::OrderedFloat;
 use warp_core::ui::icons::Icon;
 use warpui::elements::{ConstrainedBox, Container, Highlight, Text};
@@ -9,8 +9,8 @@ use warpui::{
 };
 
 use crate::appearance::Appearance;
-use crate::cloud_object::CloudObject;
-use crate::cloud_object::model::persistence::CloudModel;
+
+
 use crate::search::command_palette::warp_drive;
 use crate::search::data_source::{DataSourceSearchError, Query, QueryResult};
 use crate::search::mixer::DataSourceRunErrorWrapper;
@@ -64,7 +64,7 @@ impl PromptsMenuDataSource {
         app: &'a AppContext,
     ) -> impl Iterator<Item = &'a CloudWorkflow> {
         let spaces = UserWorkspaces::as_ref(app).spaces_for_window(self.window_id, app);
-        CloudModel::as_ref(app)
+        as_ref(app)
             .get_all_active_workflows()
             .filter(move |workflow| {
                 !workflow.model().data.is_command_workflow()

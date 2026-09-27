@@ -39,7 +39,7 @@ use super::terminal_model::{HistoryEntry, SubshellInitializationInfo};
 #[cfg(feature = "local_tty")]
 use crate::features::FeatureFlag;
 #[cfg(feature = "local_tty")]
-use crate::remote_server::manager::{RemoteServerManager, RemoteServerManagerEvent};
+use crate::manager::{RemoteServerManager, RemoteServerManagerEvent};
 use crate::server::telemetry::{BootstrappingInfo, TelemetryEvent};
 use crate::terminal::event::{ExecutedExecutorCommandEvent, RemoteServerSetupState};
 use crate::terminal::shell::{Shell, ShellType};
@@ -549,20 +549,20 @@ impl Sessions {
     }
 }
 
-impl From<SessionType> for command_corrections::SessionType {
+impl From<SessionType> for SessionType {
     fn from(session_type: SessionType) -> Self {
         match session_type {
-            SessionType::WarpifiedRemote { .. } => command_corrections::SessionType::Remote,
-            SessionType::Local => command_corrections::SessionType::Local,
+            SessionType::WarpifiedRemote { .. } => SessionType::Remote,
+            SessionType::Local => SessionType::Local,
         }
     }
 }
 
-impl From<&SessionType> for command_corrections::SessionType {
+impl From<&SessionType> for SessionType {
     fn from(session_type: &SessionType) -> Self {
         match session_type {
-            SessionType::WarpifiedRemote { .. } => command_corrections::SessionType::Remote,
-            SessionType::Local => command_corrections::SessionType::Local,
+            SessionType::WarpifiedRemote { .. } => SessionType::Remote,
+            SessionType::Local => SessionType::Local,
         }
     }
 }
@@ -601,10 +601,10 @@ pub struct HostInfo {
 impl HostInfo {
     // TODO(CORE-2219): Once we have a struct instead of a string type,
     // we should instead implement this as either
-    //   From<StructName> for command_corrections::PlatformType
-    //   TryFrom<StructName for command_corrections::PlatformType
-    pub fn platform_type(&self) -> command_corrections::PlatformType {
-        use command_corrections::PlatformType::*;
+    //   From<StructName> for PlatformType
+    //   TryFrom<StructName for PlatformType
+    pub fn platform_type(&self) -> PlatformType {
+        
 
         let Some(category) = &self.os_category else {
             return Posix;

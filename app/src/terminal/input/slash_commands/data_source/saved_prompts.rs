@@ -6,8 +6,8 @@ use warp_core::ui::appearance::Appearance;
 use warpui::fonts::FamilyId;
 use warpui::{AppContext, SingletonEntity};
 
-use crate::cloud_object::CloudObject;
-use crate::cloud_object::model::persistence::CloudModel;
+
+
 use crate::search::FuzzyMatchWorkflowResult;
 use crate::search::async_snapshot_data_source::AsyncSnapshotDataSource;
 use crate::search::data_source::{Query, QueryResult};
@@ -46,7 +46,7 @@ pub(crate) fn saved_prompts_data_source()
             let ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
             // Skip the workflow scan entirely when AI is off; the match step will return empty.
             let candidates: Vec<SavedPromptCandidate> = if ai_enabled {
-                CloudModel::as_ref(app)
+                as_ref(app)
                     .get_all_active_workflows()
                     .filter(|cw| cw.model().data.is_agent_mode_workflow())
                     .map(|cw| SavedPromptCandidate {
@@ -95,7 +95,7 @@ pub(crate) fn fuzzy_match_saved_prompts(
                         .data
                         .name_starts_with_char_ignore_case(query_char)
                     {
-                        let name_match_result = Some(fuzzy_match::FuzzyMatchResult {
+                        let name_match_result = Some(FuzzyMatchResult {
                             score: 100,
                             matched_indices: vec![0],
                         });

@@ -65,7 +65,7 @@ impl SyncDataSource for UserQueryDataSource {
                 .filter_map(|exchange| {
                     let query_text = exchange.format_input_for_copy();
                     let match_result =
-                        fuzzy_match::match_indices_case_insensitive(&query_text, &search_query)?;
+                        match_indices_case_insensitive(&query_text, &search_query)?;
 
                     Some(QueryResult::from(
                         UserQuerySearchItem::new(exchange.id, query_text)

@@ -8,8 +8,8 @@ use warpui::{App, SingletonEntity};
 
 use super::*;
 use crate::auth::AuthStateProvider;
-use crate::cloud_object::model::view::CloudViewModel;
-use crate::cloud_object::{
+
+use {
     Owner, Revision, ServerMetadata, ServerPermissions, ServerWorkflow, Space,
 };
 use crate::network::NetworkStatus;
@@ -118,10 +118,10 @@ fn initialize_app(app: &mut App, workspaces: Vec<Workspace>) {
     });
     app.add_singleton_model(TeamTesterStatus::new);
     app.add_singleton_model(SyncQueue::mock);
-    app.add_singleton_model(CloudModel::mock);
+    app.add_singleton_model(mock);
     app.add_singleton_model(|ctx| UpdateManager::new(None, Arc::new(MockObjectClient::new()), ctx));
     app.add_singleton_model(|_| UserProfiles::new(Vec::new()));
-    app.add_singleton_model(CloudViewModel::new);
+    app.add_singleton_model(new);
     app.add_singleton_model(NotebookManager::mock);
     app.add_singleton_model(|_| ServerApiProvider::new_for_test());
     app.add_singleton_model(|_| SettingsManager::default());
@@ -133,7 +133,7 @@ fn initialize_app(app: &mut App, workspaces: Vec<Workspace>) {
 /// Seeds one prompt in the window's team space, one in another team's space and one personal
 /// prompt. Every name starts with "a" so only the window scoping can narrow a prefix search.
 fn seed_prompts(app: &mut App, in_window_team: &Team, other_team: &Team) {
-    CloudModel::handle(app).update(app, |model, ctx| {
+    handle(app).update(app, |model, ctx| {
         model.upsert_from_server_workflow(
             mock_server_prompt(
                 IN_WINDOW_TEAM_PROMPT_ID.into(),
@@ -258,7 +258,7 @@ fn test_prompts_menu_search_query_only_returns_prompts_in_the_window() {
 
     App::test((), |mut app| async move {
         initialize_app(&mut app, vec![workspace]);
-        CloudModel::handle(&app).update(&mut app, |model, ctx| {
+        handle(&app).update(&mut app, |model, ctx| {
             model.upsert_from_server_workflow(
                 mock_server_prompt(
                     IN_WINDOW_TEAM_PROMPT_ID.into(),

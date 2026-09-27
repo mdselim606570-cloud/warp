@@ -871,7 +871,7 @@ impl CodeView {
         ctx: &mut ViewContext<Self>,
     ) -> SaveStatus {
         // This will only return an error immediately if there is a failure in the sync part of the call.
-        // Other errors could be returned asynchronously via the FileModelEvent::FailedToSave event.
+        // Other errors could be returned asynchronously via the Event::FailedToSave event.
         let result = self
             .tab_at(index)
             .map(|tab| {
@@ -881,7 +881,7 @@ impl CodeView {
             .unwrap_or_else(|| Err(ImmediateSaveError::NoActiveFileTab));
 
         // This will only return an error immediately if there is a failure in the sync part of the call.
-        // Other errors could be returned asynchronously via the FileModelEvent::FailedToSave event.
+        // Other errors could be returned asynchronously via the Event::FailedToSave event.
         match result {
             Err(ImmediateSaveError::NoFileId) => {
                 // If there's no file ID, this is a new file - trigger Save As
@@ -981,7 +981,7 @@ impl CodeView {
     }
 
     // Check if there are unsaved changes in the buffer.
-    // Implemented by comparing the ContentVersion in the FileModel with the ContentVersion in the Buffer.
+    // Implemented by comparing the ContentVersion in the  with the ContentVersion in the Buffer.
     pub fn contains_unsaved_changes(&self, ctx: &AppContext) -> bool {
         self.tab_group
             .iter()

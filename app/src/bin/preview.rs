@@ -6,15 +6,10 @@ use anyhow::Result;
 use warp_core::channel::{Channel, ChannelState};
 use warp_core::features;
 
-// Simple wrapper around warp::run() for feature preview channel builds.
+// Cognix v1: Local terminal only. No cloud or product features.
 fn main() -> Result<()> {
     ChannelState::set(
-        ChannelState::new(
-            Channel::Preview,
-            warp_channel_config::load_config!("preview"),
-        )
-        .with_additional_features(features::PREVIEW_FLAGS)
-        .with_additional_features(&[features::FeatureFlag::ForceLogin]),
+        ChannelState::new(Channel::Preview, warp_channel_config::load_config!("preview")),
     );
 
     warp::run()
